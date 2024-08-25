@@ -14,3 +14,18 @@ const buildBoard = function() {
 
     return board;
 };
+
+const GameController = (function() {
+    const board = buildBoard()
+
+    const mark = function(player, col, row) {
+        board.forEach((cell) => {
+            if (cell.col == col && cell.row == row) {
+                cell.value = player
+            }
+        })
+        return board
+    }
+
+    return {b, mark}
+})();
