@@ -24,8 +24,38 @@ const GameController = (function() {
                 cell.value = player
             }
         })
-        return board
+        return checkWin(player, col, row)
     }
 
-    return {b, mark}
+    const checkWin = function(player, col, row) {
+        const searchCol = (function() {
+            const thisCol = board.filter((cell) => cell.col == col)
+            return thisCol.every((cell) => cell.value == player)
+        })()
+
+        const searchRow = (function() {
+            const thisRow = board.filter((cell) => cell.row == row)
+            return thisRow.every((cell) => cell.value == player)
+        })()
+
+        const searchDiagonal = (function() {
+            const thisDiagonal = []
+            for (let i = 1; i <= 3; i++) {
+                thisDiagonal.push(board.find((cell) => cell.col == i && cell.row == i))
+            }
+            return thisDiagonal.every((cell) => cell.value == player)
+        })()
+
+        const searchOtherDiagonal = (function() {
+            const otherDiagonal = []
+            for (let i = 1, j = 3; i <= 3 && j >= 1; i++, j--) {
+                otherDiagonal.push(board.find((cell) => cell.col == j && cell.row == i))
+            }
+            return otherDiagonal.every((cell) => cell.value == player)
+        })()
+        
+        return searchCol || searchRow || searchDiagonal || searchOtherDiagonal
+    }
+
+    return {board, mark}
 })();
