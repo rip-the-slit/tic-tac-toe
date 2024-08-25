@@ -12,37 +12,43 @@ const buildBoard = function() {
         }
     }
 
-    return board;
+    const cleanBoard = function() {
+        board.forEach((cell) => cell.value = null)
+    }
+
+    return {board, cleanBoard};
 };
 
 const GameController = (function() {
-    const board = buildBoard()
+    const gameboard = buildBoard()
 
     const mark = function(col, row) {
-        board.forEach((cell) => {
+        gameboard.board.forEach((cell) => {
             if (cell.col == col && cell.row == row) {
                 cell.value = currentPlayer
             }
         })
-        checkWin(col, row)
+        if (checkWin(col, row)) {
+            giveWin()
+        }
         switchPlayer()
     }
 
     const checkWin = function(col, row) {
         const searchCol = (function() {
-            const thisCol = board.filter((cell) => cell.col == col)
+            const thisCol = gameboard.board.filter((cell) => cell.col == col)
             return thisCol.every((cell) => cell.value == currentPlayer)
         })()
 
         const searchRow = (function() {
-            const thisRow = board.filter((cell) => cell.row == row)
+            const thisRow = gameboard.board.filter((cell) => cell.row == row)
             return thisRow.every((cell) => cell.value == currentPlayer)
         })()
 
         const searchDiagonal = (function() {
             const thisDiagonal = []
             for (let i = 1; i <= 3; i++) {
-                thisDiagonal.push(board.find((cell) => cell.col == i && cell.row == i))
+                thisDiagonal.push(gameboard.board.find((cell) => cell.col == i && cell.row == i))
             }
             return thisDiagonal.every((cell) => cell.value == currentPlayer)
         })()
@@ -50,7 +56,7 @@ const GameController = (function() {
         const searchOtherDiagonal = (function() {
             const otherDiagonal = []
             for (let i = 1, j = 3; i <= 3 && j >= 1; i++, j--) {
-                otherDiagonal.push(board.find((cell) => cell.col == j && cell.row == i))
+                otherDiagonal.push(gameboard.board.find((cell) => cell.col == j && cell.row == i))
             }
             return otherDiagonal.every((cell) => cell.value == currentPlayer)
         })()
@@ -59,10 +65,18 @@ const GameController = (function() {
     }
 
     let currentPlayer = "x"
-
     const switchPlayer = function() {
         currentPlayer = (currentPlayer == "x") ? "o" : "x"
     }
 
-    return {board, mark}
+    let playerXWins = 0
+    let playerOWins = 0
+    const giveWin = function() {
+        console.log(`${currentPlayer} won!`)
+        if (currentPlayer == "x") playerXWins++
+        else playerOWins++
+        gameboard.cleanBoard()
+    }
+
+    return {gameboard, mark}
 })();
