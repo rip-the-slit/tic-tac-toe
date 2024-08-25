@@ -1,5 +1,6 @@
 const buildBoard = function() {
     const board = []
+    const getBoard = function() {return board}
 
     const Cell = function(col, row) {
         let value = null
@@ -20,14 +21,14 @@ const buildBoard = function() {
         board.forEach((cell) => cell.setValue(null))
     }
 
-    return {board, cleanBoard};
+    return {getBoard, cleanBoard};
 };
 
 const GameController = (function() {
     const gameboard = buildBoard()
 
     const mark = function(col, row) {
-        gameboard.board.forEach((cell) => {
+        gameboard.getBoard().forEach((cell) => {
             if (cell.getCol() == col && cell.getRow() == row) {
                 cell.setValue(currentPlayer)
             }
@@ -40,19 +41,19 @@ const GameController = (function() {
 
     const checkWin = function(col, row) {
         const searchCol = (function() {
-            const thisCol = gameboard.board.filter((cell) => cell.getCol() == col)
+            const thisCol = gameboard.getBoard().filter((cell) => cell.getCol() == col)
             return thisCol.every((cell) => cell.getValue() == currentPlayer)
         })()
 
         const searchRow = (function() {
-            const thisRow = gameboard.board.filter((cell) => cell.getRow() == row)
+            const thisRow = gameboard.getBoard().filter((cell) => cell.getRow() == row)
             return thisRow.every((cell) => cell.getValue() == currentPlayer)
         })()
 
         const searchDiagonal = (function() {
             const thisDiagonal = []
             for (let i = 1; i <= 3; i++) {
-                thisDiagonal.push(gameboard.board.find((cell) => cell.getCol() == i && cell.getRow() == i))
+                thisDiagonal.push(gameboard.getBoard().find((cell) => cell.getCol() == i && cell.getRow() == i))
             }
             return thisDiagonal.every((cell) => cell.getValue() == currentPlayer)
         })()
@@ -60,7 +61,7 @@ const GameController = (function() {
         const searchOtherDiagonal = (function() {
             const otherDiagonal = []
             for (let i = 1, j = 3; i <= 3 && j >= 1; i++, j--) {
-                otherDiagonal.push(gameboard.board.find((cell) => cell.getCol() == j && cell.getRow() == i))
+                otherDiagonal.push(gameboard.getBoard().find((cell) => cell.getCol() == j && cell.getRow() == i))
             }
             return otherDiagonal.every((cell) => cell.getValue() == currentPlayer)
         })()
