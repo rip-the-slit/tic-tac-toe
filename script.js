@@ -20,8 +20,15 @@ const buildBoard = function() {
     const cleanBoard = function() {
         board.forEach((cell) => cell.setValue(null))
     }
+    let boardFull = false
+    const checkBoardFull = function() {
+        if (board.every((cell) => cell.getValue() !== null)) {
+            boardFull = true
+        } else boardFull = false
+        return boardFull
+    }
 
-    return {getBoard, cleanBoard};
+    return {getBoard, cleanBoard, checkBoardFull};
 };
 
 const GameController = (function() {
@@ -35,6 +42,8 @@ const GameController = (function() {
             console.log(`Col:${col} Row:${row} set to ${currentPlayer}`)
             if (checkWin(col, row)) {
                 giveWin()
+            } else if (gameboard.checkBoardFull()) {
+                console.log('Nobody won')
             }
             switchPlayer()
         }
