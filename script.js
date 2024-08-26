@@ -28,21 +28,19 @@ const GameController = (function() {
     const gameboard = buildBoard()
 
     const mark = function(col, row) {
-        gameboard.getBoard().forEach((cell) => {
-            if (cell.getCol() == col && cell.getRow() == row) {
-                if (cell.getValue() == null) {
-                    cell.setValue(currentPlayer)
-                    console.log(`Col:${col} Row:${row} set to ${currentPlayer}`)
-                    if (checkWin(col, row)) {
-                        giveWin()
-                    }
-                    switchPlayer()
-                }
-                else {
-                    console.log('Cell already marked')
-                }
+        const cell = gameboard.getBoard().find((cell) => cell.getCol() == col && cell.getRow() == row)
+                
+        if (cell.getValue() == null) {
+            cell.setValue(currentPlayer)
+            console.log(`Col:${col} Row:${row} set to ${currentPlayer}`)
+            if (checkWin(col, row)) {
+                giveWin()
             }
-        })
+            switchPlayer()
+        }
+        else {
+            console.log('Cell already marked')
+        }
     }
 
     const checkWin = function(col, row) {
