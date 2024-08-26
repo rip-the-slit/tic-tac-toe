@@ -30,13 +30,19 @@ const GameController = (function() {
     const mark = function(col, row) {
         gameboard.getBoard().forEach((cell) => {
             if (cell.getCol() == col && cell.getRow() == row) {
-                cell.setValue(currentPlayer)
+                if (cell.getValue() == null) {
+                    cell.setValue(currentPlayer)
+                    console.log(`Col:${col} Row:${row} set to ${currentPlayer}`)
+                    if (checkWin(col, row)) {
+                        giveWin()
+                    }
+                    switchPlayer()
+                }
+                else {
+                    console.log('Cell already marked')
+                }
             }
         })
-        if (checkWin(col, row)) {
-            giveWin()
-        }
-        switchPlayer()
     }
 
     const checkWin = function(col, row) {
@@ -72,6 +78,7 @@ const GameController = (function() {
     let currentPlayer = "x"
     const switchPlayer = function() {
         currentPlayer = (currentPlayer == "x") ? "o" : "x"
+        console.log(`It's now ${currentPlayer}'s turn`)
     }
 
     let playerXWins = 0
