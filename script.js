@@ -87,6 +87,8 @@ const GameController = (function() {
         else playerOWins++
         gameboard.cleanBoard()
     }
+    const getPlayerXWins = function() {return playerXWins}
+    const getPlayerOWins = function() {return playerOWins}
 
-    return {gameboard, mark}
+    return {mark, getPlayerXWins, getPlayerOWins}
 })();
