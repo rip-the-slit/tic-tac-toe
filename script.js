@@ -18,18 +18,21 @@ const buildBoard = function() {
         }
     }
 
-    const cleanBoard = function() {
-        board.forEach((cell) => cell.setValue(null))
-    }
     let boardFull = false
     const checkBoardFull = function() {
         if (board.every((cell) => cell.getValue() !== null)) {
             boardFull = true
+            toggleGameDone()
         } else boardFull = false
         return boardFull
     }
+    let gameDone = false
+    const getGameDone = function() {return gameDone}
+    const toggleGameDone = function() {
+        gameDone = true
+    }
 
-    return {getBoard, cleanBoard, checkBoardFull};
+    return {getBoard, checkBoardFull, getGameDone, toggleGameDone};
 };
 
 const Display = (function() {
@@ -53,26 +56,39 @@ const Display = (function() {
         const row = +(event.target.getAttribute('row'))
         GameController.mark(col, row)
     }
+    const cleanContainer = function() {
+        while (boardContainer.firstChild) {
+            boardContainer.removeChild(boardContainer.firstChild)
+        }
+    }
 
-    return {addCellToContainer}
+    return {addCellToContainer, cleanContainer}
 })();
 
 const GameController = (function() {
-    const gameboard = buildBoard()
+    let gameboard = buildBoard()
+    const refreshBoard = function() {
+        gameboard = buildBoard()
+    }
     const mark = function(col, row) {
-        const cell = gameboard.getBoard().find((cell) => cell.getCol() == col && cell.getRow() == row)        
-        if (cell.getValue() == null) {
-            cell.setValue(currentPlayer)
-            console.log(`Col:${col} Row:${row} set to ${currentPlayer}`)
-            if (checkWin(col, row)) {
-                giveWin()
-            } else if (gameboard.checkBoardFull()) {
-                console.log('Nobody won')
+        if(gameboard.getGameDone()) {
+            Display.cleanContainer()
+            refreshBoard()
+        } else {
+            const cell = gameboard.getBoard().find((cell) => cell.getCol() == col && cell.getRow() == row)        
+            if (cell.getValue() == null) {
+                cell.setValue(currentPlayer)
+                console.log(`Col:${col} Row:${row} set to ${currentPlayer}`)
+                if (checkWin(col, row)) {
+                    giveWin()
+                } else if (gameboard.checkBoardFull()) {
+                    console.log('Nobody won')
+                }
+                switchPlayer()
             }
-            switchPlayer()
-        }
-        else {
-            console.log('Cell already marked')
+            else {
+                console.log('Cell already marked')
+            }
         }
     }
     const checkWin = function(col, row) {
@@ -116,7 +132,7 @@ const GameController = (function() {
         console.log(`${currentPlayer} won!`)
         if (currentPlayer == "x") playerXWins++
         else playerOWins++
-        gameboard.cleanBoard()
+        gameboard.toggleGameDone()
     }
     const getPlayerXWins = function() {return playerXWins}
     const getPlayerOWins = function() {return playerOWins}
