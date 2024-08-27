@@ -42,14 +42,24 @@
   }
 
 .board-container {
-    width: 500px;
-    height: 500px;
+    width: 300px;
+    height: 300px;
     display: grid;
     grid-auto-flow: column;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(3, 1fr);
+    grid-template-columns: repeat(3, 100px);
+    grid-template-rows: repeat(3, 100px);
+    gap: 5px;
+    background: black;
 }
 
 .cell {
-    border: 2px solid black;
+    background: white;
+}
+
+.cell[value="x"]::after {
+    content: url(./images/close-thick.svg);
+}
+
+.cell[value="o"]::after {
+    content: url(./images/circle-outline.svg);
 }
