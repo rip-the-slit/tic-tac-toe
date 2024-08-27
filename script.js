@@ -37,6 +37,7 @@ const buildBoard = function() {
 
 const Display = (function() {
     const boardContainer = document.querySelector('.board-container')
+    const status = document.querySelector('.status')
     const addCellToContainer = function(col, row) {
         const div = document.createElement('div')
         div.classList += 'cell'
@@ -61,8 +62,15 @@ const Display = (function() {
             boardContainer.removeChild(boardContainer.firstChild)
         }
     }
-
-    return {addCellToContainer, cleanContainer}
+    const updateStatus = function(text, importance) {
+        if (text !== '') {status.textContent = text}
+        status.setAttribute('important', `${importance}`)
+    }
+    const checkStatusImportance = function() {
+        return status.getAttribute('important')
+    }
+    
+    return {addCellToContainer, cleanContainer, updateStatus, checkStatusImportance}
 })();
 
 const GameController = (function() {
@@ -73,6 +81,7 @@ const GameController = (function() {
     const mark = function(col, row) {
         if(gameboard.getGameDone()) {
             Display.cleanContainer()
+            Display.updateStatus('')
             refreshBoard()
         } else {
             const cell = gameboard.getBoard().find((cell) => cell.getCol() == col && cell.getRow() == row)        
@@ -82,12 +91,9 @@ const GameController = (function() {
                 if (checkWin(col, row)) {
                     giveWin()
                 } else if (gameboard.checkBoardFull()) {
-                    console.log('Nobody won')
+                    Display.updateStatus('Nobody won', 'win')
                 }
                 switchPlayer()
-            }
-            else {
-                console.log('Cell already marked')
             }
         }
     }
@@ -124,12 +130,14 @@ const GameController = (function() {
     const getCurrentPlayer = function() {return currentPlayer}
     const switchPlayer = function() {
         currentPlayer = (currentPlayer == "x") ? "o" : "x"
-        console.log(`It's now ${currentPlayer}'s turn`)
+        if (Display.checkStatusImportance() !== 'win') {
+            Display.updateStatus(`It's now ${currentPlayer}'s turn`, true)
+        } else {Display.updateStatus('', false)}
     }
     let playerXWins = 0
     let playerOWins = 0
     const giveWin = function() {
-        console.log(`${currentPlayer} won!`)
+        Display.updateStatus(`${currentPlayer} won!`, 'win')
         if (currentPlayer == "x") playerXWins++
         else playerOWins++
         gameboard.toggleGameDone()
