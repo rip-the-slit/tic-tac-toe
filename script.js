@@ -39,7 +39,19 @@ const Display = (function() {
         div.classList += 'cell'
         div.setAttribute('col', `${col}`)
         div.setAttribute('row', `${row}`)
+        bindEvent(div, callController)
         boardContainer.appendChild(div)
+    }
+    const bindEvent = function(div, callback) {
+        div.addEventListener('click', callback)
+    }
+    const callController = function(event) {
+        if (!(event.target.getAttribute('value'))) {
+            event.target.setAttribute('value', `${GameController.getCurrentPlayer()}`)
+        }
+        const col = +(event.target.getAttribute('col'))
+        const row = +(event.target.getAttribute('row'))
+        GameController.mark(col, row)
     }
 
     return {addCellToContainer}
@@ -93,6 +105,7 @@ const GameController = (function() {
         return searchCol || searchRow || searchDiagonal || searchOtherDiagonal
     }
     let currentPlayer = "x"
+    const getCurrentPlayer = function() {return currentPlayer}
     const switchPlayer = function() {
         currentPlayer = (currentPlayer == "x") ? "o" : "x"
         console.log(`It's now ${currentPlayer}'s turn`)
@@ -108,5 +121,5 @@ const GameController = (function() {
     const getPlayerXWins = function() {return playerXWins}
     const getPlayerOWins = function() {return playerOWins}
 
-    return {mark, getPlayerXWins, getPlayerOWins}
+    return {mark, getCurrentPlayer, getPlayerXWins, getPlayerOWins}
 })();
