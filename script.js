@@ -14,6 +14,7 @@ const buildBoard = function() {
     for(let col = 1; col <= 3; col++) {
         for (let row = 1; row <= 3; row++) {
             board.push(Cell(col, row))
+            Display.addCellToContainer(col, row)
         }
     }
 
@@ -31,12 +32,23 @@ const buildBoard = function() {
     return {getBoard, cleanBoard, checkBoardFull};
 };
 
+const Display = (function() {
+    const boardContainer = document.querySelector('.board-container')
+    const addCellToContainer = function(col, row) {
+        const div = document.createElement('div')
+        div.classList += 'cell'
+        div.setAttribute('col', `${col}`)
+        div.setAttribute('row', `${row}`)
+        boardContainer.appendChild(div)
+    }
+
+    return {addCellToContainer}
+})();
+
 const GameController = (function() {
     const gameboard = buildBoard()
-
     const mark = function(col, row) {
-        const cell = gameboard.getBoard().find((cell) => cell.getCol() == col && cell.getRow() == row)
-                
+        const cell = gameboard.getBoard().find((cell) => cell.getCol() == col && cell.getRow() == row)        
         if (cell.getValue() == null) {
             cell.setValue(currentPlayer)
             console.log(`Col:${col} Row:${row} set to ${currentPlayer}`)
@@ -51,7 +63,6 @@ const GameController = (function() {
             console.log('Cell already marked')
         }
     }
-
     const checkWin = function(col, row) {
         const searchCol = (function() {
             const thisCol = gameboard.getBoard().filter((cell) => cell.getCol() == col)
@@ -81,13 +92,11 @@ const GameController = (function() {
         
         return searchCol || searchRow || searchDiagonal || searchOtherDiagonal
     }
-
     let currentPlayer = "x"
     const switchPlayer = function() {
         currentPlayer = (currentPlayer == "x") ? "o" : "x"
         console.log(`It's now ${currentPlayer}'s turn`)
     }
-
     let playerXWins = 0
     let playerOWins = 0
     const giveWin = function() {
