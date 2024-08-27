@@ -41,6 +41,14 @@
     overflow-wrap: break-word;
   }
 
+body {
+  --green: #34d399;
+  --slate: #f1f5f9;
+  display: grid;
+  place-content: center;
+  height: 100vh;
+}
+
 .board-container {
     width: 300px;
     height: 300px;
@@ -48,12 +56,17 @@
     grid-auto-flow: column;
     grid-template-columns: repeat(3, 100px);
     grid-template-rows: repeat(3, 100px);
-    gap: 5px;
     background: black;
 }
 
-.cell {
-    background: white;
+.cell,
+.cell[col="2"][row="2"] {
+    background: var(--slate);
+}
+
+.cell[col="2"],
+.cell[row="2"] {
+  background: var(--green);
 }
 
 .cell[value="x"]::after {
