@@ -101,10 +101,8 @@ const Display = (function() {
         })
     }
     let animationRunning = true
-    const getAnimationRunning = function() {return animationRunning}
     
-    return {addCellToContainer, cleanContainer, updateStatus, checkStatusImportance, stopAnimation,
-            getAnimationRunning}
+    return {addCellToContainer, cleanContainer, updateStatus, checkStatusImportance}
 })();
 
 const GameController = (function() {
