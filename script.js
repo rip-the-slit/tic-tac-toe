@@ -39,6 +39,7 @@ const Display = (function() {
     const boardContainer = document.querySelector('.board-container')
     const status = document.querySelector('.status')
     const counters = document.querySelectorAll('.win-counters span')
+    const inputs = document.querySelectorAll('.win-counters input')
     const addCellToContainer = function(col, row) {
         const div = document.createElement('div')
         div.classList += 'cell'
@@ -109,8 +110,13 @@ const Display = (function() {
             counters[1].textContent = count
         }
     }
+    const getNames = function(mark) {
+        if (mark == 'x') {return inputs[0].value}
+        else {return inputs[1].value}
+    }
     
-    return {addCellToContainer, cleanContainer, updateStatus, checkStatusImportance, updateWins}
+    return {addCellToContainer, cleanContainer, updateStatus, checkStatusImportance, updateWins,
+            getNames}
 })();
 
 const GameController = (function() {
@@ -120,12 +126,20 @@ const GameController = (function() {
     }
     const Player = function(mark) {
         const getMark = function() {return mark}
+        let name = mark
+        const updateName = function() {
+            name = Display.getNames(mark)
+        }
+        const getName = function() {
+            updateName()
+            return name
+        }
         let wins = 0
         const incrementWins = function() {
             wins++
             Display.updateWins(mark, wins)
         }
-        return {getMark, incrementWins}
+        return {getMark, incrementWins, getName}
     }
     const playerX = Player('x')
     const playerO = Player('o')
@@ -182,18 +196,14 @@ const GameController = (function() {
     const switchPlayer = function() {
         currentPlayer = (currentPlayer.getMark() == "x") ? playerO : playerX
         if (Display.checkStatusImportance() !== 'win') {
-            Display.updateStatus(`It's now ${currentPlayer.getMark()}'s turn`, true)
+            Display.updateStatus(`It's now ${currentPlayer.getName()}'s turn`, true)
         } else {Display.updateStatus('', false)}
     }
-    let playerXWins = 0
-    let playerOWins = 0
     const giveWin = function() {
-        Display.updateStatus(`${currentPlayer.getMark()} won!`, 'win')
+        Display.updateStatus(`${currentPlayer.getName()} won!`, 'win')
         currentPlayer.incrementWins()
         gameboard.toggleGameDone()
     }
-    const getPlayerXWins = function() {return playerXWins}
-    const getPlayerOWins = function() {return playerOWins}
 
-    return {mark, getCurrentPlayer, getPlayerXWins, getPlayerOWins}
+    return {mark, getCurrentPlayer}
 })();
