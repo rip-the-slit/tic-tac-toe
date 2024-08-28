@@ -148,3 +148,8 @@ body {
   padding: 0 3px;
   background: var(--slate);
 }
+
+.win-counters span {
+  margin-left: 5px;
+  font-weight: 300;
+}
