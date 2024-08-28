@@ -40,6 +40,7 @@ const Display = (function() {
     const status = document.querySelector('.status')
     const counters = document.querySelectorAll('.win-counters span')
     const inputs = document.querySelectorAll('.win-counters input')
+    const restartButton = document.querySelector('.restart')
     const addCellToContainer = function(col, row) {
         const div = document.createElement('div')
         div.classList += 'cell'
@@ -52,13 +53,18 @@ const Display = (function() {
         div.addEventListener('click', callback)
     }
     const callController = function(event) {
-        if (animationRunning) {stopAnimation()}
-        if (!(event.target.getAttribute('value'))) {
-            event.target.setAttribute('value', `${GameController.getCurrentPlayer()}`)
+        if (animationRunning) {
+            stopAnimation()
+            updateStatus(`${GameController.getCurrentPlayer(true)} begins`, false)
         }
-        const col = +(event.target.getAttribute('col'))
-        const row = +(event.target.getAttribute('row'))
-        GameController.mark(col, row)
+        else {
+            if (!(event.target.getAttribute('value'))) {
+                event.target.setAttribute('value', `${GameController.getCurrentPlayer()}`)
+            }
+            const col = +(event.target.getAttribute('col'))
+            const row = +(event.target.getAttribute('row'))
+            GameController.mark(col, row)
+        }
     }
     const cleanContainer = function() {
         while (boardContainer.firstChild) {
@@ -114,6 +120,14 @@ const Display = (function() {
         if (mark == 'x') {return inputs[0].value}
         else {return inputs[1].value}
     }
+    const restartController = function() {
+        if (animationRunning) {stopAnimation()}
+        else {fakeCleanContainer()}
+        GameController.refreshBoard()
+        updateStatus(`${GameController.getCurrentPlayer(true)} begins`, false)
+    }
+    bindEvent(restartButton, restartController)
+
     
     return {addCellToContainer, cleanContainer, updateStatus, checkStatusImportance, updateWins,
             getNames}
@@ -192,7 +206,10 @@ const GameController = (function() {
         return searchCol || searchRow || searchDiagonal || searchOtherDiagonal
     }
     let currentPlayer = playerX
-    const getCurrentPlayer = function() {return currentPlayer.getMark()}
+    const getCurrentPlayer = function(name) {
+        if(name) {return currentPlayer.getName()}
+        else {return currentPlayer.getMark()}
+    }
     const switchPlayer = function() {
         currentPlayer = (currentPlayer.getMark() == "x") ? playerO : playerX
         if (Display.checkStatusImportance() !== 'win') {
@@ -205,5 +222,5 @@ const GameController = (function() {
         gameboard.toggleGameDone()
     }
 
-    return {mark, getCurrentPlayer}
+    return {mark, getCurrentPlayer, refreshBoard}
 })();
