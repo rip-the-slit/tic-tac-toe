@@ -38,6 +38,7 @@ const buildBoard = function() {
 const Display = (function() {
     const boardContainer = document.querySelector('.board-container')
     const status = document.querySelector('.status')
+    const counters = document.querySelectorAll('.win-counters span')
     const addCellToContainer = function(col, row) {
         const div = document.createElement('div')
         div.classList += 'cell'
@@ -101,8 +102,15 @@ const Display = (function() {
         })
     }
     let animationRunning = true
+    const updateWins = function(mark, count) {
+        if (mark == 'x') {
+            counters[0].textContent = count
+        } else {
+            counters[1].textContent = count
+        }
+    }
     
-    return {addCellToContainer, cleanContainer, updateStatus, checkStatusImportance}
+    return {addCellToContainer, cleanContainer, updateStatus, checkStatusImportance, updateWins}
 })();
 
 const GameController = (function() {
@@ -110,6 +118,17 @@ const GameController = (function() {
     const refreshBoard = function() {
         gameboard = buildBoard()
     }
+    const Player = function(mark) {
+        const getMark = function() {return mark}
+        let wins = 0
+        const incrementWins = function() {
+            wins++
+            Display.updateWins(mark, wins)
+        }
+        return {getMark, incrementWins}
+    }
+    const playerX = Player('x')
+    const playerO = Player('o')
     const mark = function(col, row) {
         if(gameboard.getGameDone()) {
             Display.cleanContainer()
@@ -118,8 +137,8 @@ const GameController = (function() {
         } else {
             const cell = gameboard.getBoard().find((cell) => cell.getCol() == col && cell.getRow() == row)        
             if (cell.getValue() == null) {
-                cell.setValue(currentPlayer)
-                console.log(`Col:${col} Row:${row} set to ${currentPlayer}`)
+                cell.setValue(currentPlayer.getMark())
+                console.log(`Col:${col} Row:${row} set to ${currentPlayer.getMark()}`)
                 if (checkWin(col, row)) {
                     giveWin()
                 } else if (gameboard.checkBoardFull()) {
@@ -132,12 +151,12 @@ const GameController = (function() {
     const checkWin = function(col, row) {
         const searchCol = (function() {
             const thisCol = gameboard.getBoard().filter((cell) => cell.getCol() == col)
-            return thisCol.every((cell) => cell.getValue() == currentPlayer)
+            return thisCol.every((cell) => cell.getValue() == currentPlayer.getMark())
         })()
 
         const searchRow = (function() {
             const thisRow = gameboard.getBoard().filter((cell) => cell.getRow() == row)
-            return thisRow.every((cell) => cell.getValue() == currentPlayer)
+            return thisRow.every((cell) => cell.getValue() == currentPlayer.getMark())
         })()
 
         const searchDiagonal = (function() {
@@ -145,7 +164,7 @@ const GameController = (function() {
             for (let i = 1; i <= 3; i++) {
                 thisDiagonal.push(gameboard.getBoard().find((cell) => cell.getCol() == i && cell.getRow() == i))
             }
-            return thisDiagonal.every((cell) => cell.getValue() == currentPlayer)
+            return thisDiagonal.every((cell) => cell.getValue() == currentPlayer.getMark())
         })()
 
         const searchOtherDiagonal = (function() {
@@ -153,25 +172,24 @@ const GameController = (function() {
             for (let i = 1, j = 3; i <= 3 && j >= 1; i++, j--) {
                 otherDiagonal.push(gameboard.getBoard().find((cell) => cell.getCol() == j && cell.getRow() == i))
             }
-            return otherDiagonal.every((cell) => cell.getValue() == currentPlayer)
+            return otherDiagonal.every((cell) => cell.getValue() == currentPlayer.getMark())
         })()
         
         return searchCol || searchRow || searchDiagonal || searchOtherDiagonal
     }
-    let currentPlayer = "x"
-    const getCurrentPlayer = function() {return currentPlayer}
+    let currentPlayer = playerX
+    const getCurrentPlayer = function() {return currentPlayer.getMark()}
     const switchPlayer = function() {
-        currentPlayer = (currentPlayer == "x") ? "o" : "x"
+        currentPlayer = (currentPlayer.getMark() == "x") ? playerO : playerX
         if (Display.checkStatusImportance() !== 'win') {
-            Display.updateStatus(`It's now ${currentPlayer}'s turn`, true)
+            Display.updateStatus(`It's now ${currentPlayer.getMark()}'s turn`, true)
         } else {Display.updateStatus('', false)}
     }
     let playerXWins = 0
     let playerOWins = 0
     const giveWin = function() {
-        Display.updateStatus(`${currentPlayer} won!`, 'win')
-        if (currentPlayer == "x") playerXWins++
-        else playerOWins++
+        Display.updateStatus(`${currentPlayer.getMark()} won!`, 'win')
+        currentPlayer.incrementWins()
         gameboard.toggleGameDone()
     }
     const getPlayerXWins = function() {return playerXWins}
