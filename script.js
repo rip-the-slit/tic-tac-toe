@@ -50,6 +50,7 @@ const Display = (function() {
         div.addEventListener('click', callback)
     }
     const callController = function(event) {
+        if (animationRunning) {stopAnimation()}
         if (!(event.target.getAttribute('value'))) {
             event.target.setAttribute('value', `${GameController.getCurrentPlayer()}`)
         }
@@ -69,8 +70,41 @@ const Display = (function() {
     const checkStatusImportance = function() {
         return status.getAttribute('important')
     }
+    const animation = (function() {
+        const cells = boardContainer.childNodes
+        let index = 0
+        let mark = 'x'
+        const interval = setInterval(() => {
+            if ((Math.random()) > 0.5) {
+                mark = 'o'
+            } else {mark = 'x'}
+            if (index > 8) {index = 0}
+            if (cells[index - 5]) {
+                cells[index - 5].setAttribute('value', '')
+            }
+            if (index < 5) {
+                cells[index + 4].setAttribute('value', '')
+            }
+            cells[index].setAttribute('value', `${mark}`)
+            index++
+        }, 350);
+        return interval
+    })()
+    const stopAnimation = function() {
+        clearInterval(animation)
+        fakeCleanContainer()
+        animationRunning = false
+    }
+    const fakeCleanContainer = function() {
+        boardContainer.childNodes.forEach((cell) => {
+            cell.setAttribute('value', '')
+        })
+    }
+    let animationRunning = true
+    const getAnimationRunning = function() {return animationRunning}
     
-    return {addCellToContainer, cleanContainer, updateStatus, checkStatusImportance}
+    return {addCellToContainer, cleanContainer, updateStatus, checkStatusImportance, stopAnimation,
+            getAnimationRunning}
 })();
 
 const GameController = (function() {
